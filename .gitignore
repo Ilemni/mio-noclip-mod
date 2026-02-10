@@ -1,0 +1,34 @@
+# Build directories
+build/
+install/
+out/
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+*.cmake
+!CMakeLists.txt
+!CMakePresets.json
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+
+# Build artifacts
+*.obj
+*.lib
+*.exp
+*.pdb
+*.ilk
+*.dll
+*.exe
+
+# Vcpkg
+vcpkg_installed/
+
+# Custom
+.vscode/
+include/*
+lib/*
