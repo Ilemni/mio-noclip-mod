@@ -1,6 +1,11 @@
 # mio-noclip-mod
 A noclip mod for MIO: Memories in Orbit
 
+## Summary
+
+This mod allows freely moving through the world without regard for gravity, collision, or damage surfaces.
+Although damage sources aren't entirely ignored, during noclip. the player's HP is set every tick to either the amount they entered noclip with, or 1, whichever is higher.
+
 ## Controls
 
 - All controls use the numkey pad
@@ -11,6 +16,7 @@ A noclip mod for MIO: Memories in Orbit
 - `0` to reset Z position to 0.
 - `/` to save a position, `*` to teleport to that saved position. By default this is the world origin.
 - `+` to print current position to console
+
 
 ## Prerequisites
 
