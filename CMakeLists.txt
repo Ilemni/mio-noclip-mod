@@ -14,19 +14,19 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
-add_library(my_mod MODULE
+add_library(noclip MODULE
     src/my_mod.cpp
 )
 
-target_link_libraries(my_mod PRIVATE
+target_link_libraries(noclip PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/lib/winhttp.lib
 )
 
-target_include_directories(my_mod PRIVATE
+target_include_directories(noclip PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
-set_target_properties(my_mod PROPERTIES
+set_target_properties(noclip PROPERTIES
     PREFIX ""
     SUFFIX ".dll"
 )
