@@ -3,14 +3,17 @@ A noclip mod for MIO: Memories in Orbit
 
 ## Controls
 
-- All controls use the numkey pad
-- `2` to enter/exit noclip. Anything that sets position is ignored when noclip is disabled. Noclip is automatically disabled while in menu or credits.
-- `1`,`3` to decrease/increase speed by a factor of 2
-- `8`,`4`,`5`,`6` work as WASD.
-- `7`,`9` to move along Z axis. Only works in some scenarios.
-- `0` to reset Z position to 0.
-- `/` to save a position, `*` to teleport to that saved position. By default this is the world origin.
-- `+` to print current position to console
+- All controls use the numkey pad by default. These controls can be rebound.
+- `2`: Enter/exit noclip. Anything that sets position is ignored when noclip is disabled. Noclip is automatically disabled while in menu or credits.
+- `1`,`3`: Decrease/Increase speed by a factor of 2
+- `8`,`4`,`5`,`6`: WASD movement.
+- `7`,`9`: Move along Z axis. Only works in some scenarios.
+- `0`: Reset Z position to 0.
+- `/`: Save a position, `*`: Teleport to that saved position. By default this is the world origin.
+- `+`: Print current player position to console
+- `DEL`: Reload keybind file. This key cannot be rebound at this time.
+
+The keybind file is located in the MIO install's `modconfig\noclip` folder. The keybind values use [Virtual Key Codes](https://learn.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes).
 
 ## Prerequisites
 
