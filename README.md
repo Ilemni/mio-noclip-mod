@@ -1,6 +1,11 @@
 # mio-noclip-mod
 A noclip mod for MIO: Memories in Orbit
 
+## Summary
+
+This mod allows freely moving through the world without regard for gravity, collision, or damage surfaces.
+Although damage sources aren't entirely ignored, during noclip. the player's HP is set every tick to either the amount they entered noclip with, or 1, whichever is higher.
+
 ## Controls
 
 - All controls use the numkey pad by default. These controls can be rebound.
@@ -14,6 +19,7 @@ A noclip mod for MIO: Memories in Orbit
 - `DEL`: Reload keybind file. This key cannot be rebound at this time.
 
 The keybind file is located in the MIO install's `modconfig\noclip` folder. The keybind values use [Virtual Key Codes](https://learn.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes).
+
 
 ## Prerequisites
 
