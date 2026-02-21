@@ -1,8 +1,9 @@
 ﻿#include "noclip.h"
 
-#include "keybind.h"
 #include "modding_api.h"
 #include "my_mod.h"
+#include "keybind.h"
+#include "teleport_list.h"
 
 #define K_TOGGLENOCLIP 0
 #define K_PRINTPOS 1
@@ -18,6 +19,8 @@
 #define K_SAVEPOS 11
 #define K_LOADPOS 12
 #define K_RELOADCONFIG 13
+#define K_PREVTELEPORT 14
+#define K_NEXTTELEPORT 15
 
 // Gameplay vars
 f32x3 savedLoc = make_f32x3(0, 0, 0);
@@ -29,7 +32,7 @@ int hpLastFrame;
 int hpOnEnterNoClip;
 bool noClipEnabled;
 
-void SetLoc(f32x3 loc) {
+void SetLoc(const f32x3 loc) {
     SetPlayerLocation(loc);
     locLastFrame = loc;
 }
@@ -48,7 +51,8 @@ void LoadKeybinds() {
     };
 
     const auto printLoc = [] {
-        std::printf("Player location: %.2f, %.2f, %.2f\n", currentLoc.x, currentLoc.y, currentLoc.z);
+        std::printf("Player location: %.2f, %.2f, %.2f\n%.2f %.2f (for copying to locations.txt)\n",
+            currentLoc.x, currentLoc.y, currentLoc.z, currentLoc.x, currentLoc.y);
     };
 
     const auto moveLeft = [] { if (noClipEnabled) currentLoc.x -= speed; };
@@ -62,7 +66,9 @@ void LoadKeybinds() {
     const auto increaseSpeed = [] { speed *= 2.0f; };
     const auto savePosition = [] { savedLoc = currentLoc; };
     const auto loadPosition = [] { if (noClipEnabled) SetLoc(savedLoc); };
-    const auto reloadConfig = [] { ReadKeybindConfig(); };
+    const auto reloadConfig = [] { ReadKeybindConfig(); ReadLocations(); };
+    const auto prevTeleport = [] { PrevTeleport(&currentLoc); };
+    const auto nextTeleport = [] { NextTeleport(&currentLoc); };
 
     keybinds[K_TOGGLENOCLIP] = {"ToggleNoClip", VK_NUMPAD2, false, toggleNoClip};
     keybinds[K_PRINTPOS] = {"PrintPosition", VK_ADD, false, printLoc};
@@ -78,6 +84,8 @@ void LoadKeybinds() {
     keybinds[K_SAVEPOS] = {"SavePosition", VK_DIVIDE, false, savePosition};
     keybinds[K_LOADPOS] = {"LoadPosition", VK_MULTIPLY, false, loadPosition};
     keybinds[K_RELOADCONFIG] = {"ReloadConfig", VK_DELETE, false, reloadConfig};
+    keybinds[K_PREVTELEPORT] = {"PrevTeleport", VK_SUBTRACT, false, prevTeleport };
+    keybinds[K_NEXTTELEPORT] = {"NextTeleport", VK_ADD, false, nextTeleport};
 
     ReadKeybindConfig();
 }
@@ -102,6 +110,7 @@ void UpdateInput() {
 
 DWORD WINAPI NoClip(LPVOID lpParam) {
     LoadKeybinds();
+    ReadLocations();
 
     // Looking for game window
     while (g_Running && !g_HWND) {
@@ -153,6 +162,7 @@ DWORD WINAPI NoClip(LPVOID lpParam) {
 
 
         if (noClipEnabled) {
+            TryActivate(K_PREVTELEPORT) || TryActivate(K_NEXTTELEPORT);
             TryActivate(K_MOVELEFT);
             TryActivate(K_MOVERIGHT);
             TryActivate(K_MOVEDOWN);

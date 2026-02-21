@@ -18,6 +18,7 @@ add_library(noclip MODULE
     src/my_mod.cpp
     src/noclip.cpp
     src/keybind.cpp
+    src/teleport_list.cpp
 )
 
 target_link_libraries(noclip PRIVATE
