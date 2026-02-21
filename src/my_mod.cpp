@@ -90,6 +90,13 @@ void LoadKeybinds() {
 }
 
 void UpdateInput() {
+    if (GetForegroundWindow() != g_HWND) {
+        // Clear input when not focused
+        std::fill(current.begin(), current.end(), 0);
+        current.swap(previous);
+        return;
+    }
+
     const unsigned long idActive = GetWindowThreadProcessId(g_HWND, nullptr);
     if (AttachThreadInput(GetCurrentThreadId(), idActive, TRUE)) {
         GetKeyState(0);
