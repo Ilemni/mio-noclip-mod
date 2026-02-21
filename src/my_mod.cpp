@@ -30,6 +30,8 @@ HWND g_HWND = nullptr;
 // Gameplay vars
 f32x3 savedLoc = make_f32x3(0, 0, 0);
 f32x3 locLastFrame = make_f32x3(0, 0, 0);
+f32x3 currentLoc = make_f32x3(0, 0, 0);
+
 float speed = 0.0625f;
 int hpLastFrame;
 int hpOnEnterNoClip;
@@ -41,9 +43,9 @@ void SetLoc(f32x3 loc) {
 }
 
 void LoadKeybinds() {
-    const auto toggleNoClip = [](f32x3 *loc) {
+    const auto toggleNoClip = [] {
         noClipEnabled = !noClipEnabled;
-        locLastFrame = *loc;
+        locLastFrame = currentLoc;
         if (noClipEnabled) {
             hpOnEnterNoClip = GetPlayerHealth();
             hpLastFrame = max(1, hpOnEnterNoClip);
@@ -53,22 +55,22 @@ void LoadKeybinds() {
         }
     };
 
-    const auto printLoc = [](f32x3 *loc) {
-        std::printf("Player location: %.2f, %.2f, %.2f\n", loc->x, loc->y, loc->z);
+    const auto printLoc = [] {
+        std::printf("Player location: %.2f, %.2f, %.2f\n", currentLoc.x, currentLoc.y, currentLoc.z);
     };
 
-    const auto moveLeft = [](f32x3 *loc) { if (noClipEnabled) loc->x -= speed; };
-    const auto moveRight = [](f32x3 *loc) { if (noClipEnabled) loc->x += speed; };
-    const auto moveDown = [](f32x3 *loc) { if (noClipEnabled) loc->y -= speed; };
-    const auto moveUp = [](f32x3 *loc) { if (noClipEnabled) loc->y += speed; };
-    const auto moveForward = [](f32x3 *loc) { if (noClipEnabled) loc->z += speed; };
-    const auto moveBackward = [](f32x3 *loc) { if (noClipEnabled) loc->z -= speed; };
-    const auto resetZ = [](f32x3 *loc) { if (noClipEnabled) loc->z = 0; };
-    const auto decreaseSpeed = [](f32x3 *) { speed *= 0.5f; };
-    const auto increaseSpeed = [](f32x3 *) { speed *= 2.0f; };
-    const auto savePosition = [](f32x3 *loc) { savedLoc = *loc; };
-    const auto loadPosition = [](f32x3 *) { if (noClipEnabled) SetLoc(savedLoc); };
-    const auto reloadConfig = [](f32x3 *) { ReadKeybindConfig(); };
+    const auto moveLeft = [] { if (noClipEnabled) currentLoc.x -= speed; };
+    const auto moveRight = [] { if (noClipEnabled) currentLoc.x += speed; };
+    const auto moveDown = [] { if (noClipEnabled) currentLoc.y -= speed; };
+    const auto moveUp = [] { if (noClipEnabled) currentLoc.y += speed; };
+    const auto moveForward = [] { if (noClipEnabled) currentLoc.z += speed; };
+    const auto moveBackward = [] { if (noClipEnabled) currentLoc.z -= speed; };
+    const auto resetZ = [] { if (noClipEnabled) currentLoc.z = 0; };
+    const auto decreaseSpeed = [] { speed *= 0.5f; };
+    const auto increaseSpeed = [] { speed *= 2.0f; };
+    const auto savePosition = [] { savedLoc = currentLoc; };
+    const auto loadPosition = [] { if (noClipEnabled) SetLoc(savedLoc); };
+    const auto reloadConfig = [] { ReadKeybindConfig(); };
 
     keybinds[K_TOGGLENOCLIP] = {"ToggleNoClip", VK_NUMPAD2, false, toggleNoClip};
     keybinds[K_PRINTPOS] = {"PrintPosition", VK_ADD, false, printLoc};
@@ -125,49 +127,49 @@ DWORD WINAPI MyModCode(LPVOID lpParam) {
         Sleep(1); // Update every 1ms, 10ms is a bit too jittery
         UpdateInput();
 
-        f32x3 loc = GetPlayerLocation(); // Gets the player's location
+        currentLoc = GetPlayerLocation(); // Gets the player's location
 
-        TryActivate(K_RELOADCONFIG, &loc);
+        TryActivate(K_RELOADCONFIG);
 
         // Debug print location
-        TryActivate(K_PRINTPOS, &loc);
+        TryActivate(K_PRINTPOS);
 
         // Cancel noclip if not a valid location (e.g. main menu or credits)
-        if (loc.x == -1 && loc.y == -1 && loc.z == -1) {
-            savedLoc = loc;
+        if (currentLoc.x == -1 && currentLoc.y == -1 && currentLoc.z == -1) {
+            savedLoc = currentLoc;
             noClipEnabled = false;
             Sleep(10);
             continue;
         }
 
         // Toggle noclip
-        TryActivate(K_TOGGLENOCLIP, &loc);
+        TryActivate(K_TOGGLENOCLIP);
 
         // "No-clip" until we figure out preventing damage
         if (noClipEnabled) {
             const int hp = max(1, hpLastFrame);
             SetPlayerHealth(hp);
             SetPlayerLocation(locLastFrame);
-            loc = locLastFrame;
+            currentLoc = locLastFrame;
         }
 
         // Save/Set location
-        TryActivate(K_SAVEPOS, &loc) || TryActivate(K_LOADPOS, &loc);
+        TryActivate(K_SAVEPOS) || TryActivate(K_LOADPOS);
 
         // Speed modifiers
-        TryActivate(K_DECREASESPEED, &loc) || TryActivate(K_INCREASESPEED, &loc);
+        TryActivate(K_DECREASESPEED) || TryActivate(K_INCREASESPEED);
 
 
         if (noClipEnabled) {
-            TryActivate(K_MOVELEFT, &loc);
-            TryActivate(K_MOVERIGHT, &loc);
-            TryActivate(K_MOVEDOWN, &loc);
-            TryActivate(K_MOVEUP, &loc);
-            TryActivate(K_MOVEBACKWARD, &loc);
-            TryActivate(K_MOVEFORWARD, &loc);
-            TryActivate(K_RESETZ, &loc);
+            TryActivate(K_MOVELEFT);
+            TryActivate(K_MOVERIGHT);
+            TryActivate(K_MOVEDOWN);
+            TryActivate(K_MOVEUP);
+            TryActivate(K_MOVEBACKWARD);
+            TryActivate(K_MOVEFORWARD);
+            TryActivate(K_RESETZ);
 
-            SetLoc(loc);
+            SetLoc(currentLoc);
         }
 
         hpLastFrame = GetPlayerHealth();

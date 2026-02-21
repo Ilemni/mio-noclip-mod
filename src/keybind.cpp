@@ -77,9 +77,9 @@ bool GetKey(const keybind &kb) {
     return (current[vkCode] & 0xF0) && !(previous[vkCode] & 0xF0);
 }
 
-bool TryActivate(byte kCode, f32x3 *loc) {
+bool TryActivate(byte kCode) {
     if (const auto &kb = keybinds[kCode]; GetKey(kb)) {
-        kb.callback(loc);
+        kb.callback();
         return true;
     }
     return false;
