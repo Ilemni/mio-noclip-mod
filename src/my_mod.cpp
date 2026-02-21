@@ -21,6 +21,7 @@
 #define K_INCREASESPEED 10
 #define K_SAVEPOS 11
 #define K_LOADPOS 12
+#define K_RELOADCONFIG 13
 
 // Program vars
 bool g_Running = true;
@@ -33,10 +34,6 @@ float speed = 0.0625f;
 int hpLastFrame;
 int hpOnEnterNoClip;
 bool noClipEnabled;
-
-bool GetVKeyDown(byte vkCode) {
-    return (current[vkCode] & 0xF0) && !(previous[vkCode] & 0xF0);
-}
 
 void SetLoc(f32x3 loc) {
     SetPlayerLocation(loc);
@@ -71,6 +68,7 @@ void LoadKeybinds() {
     const auto increaseSpeed = [](f32x3 *) { speed *= 2.0f; };
     const auto savePosition = [](f32x3 *loc) { savedLoc = *loc; };
     const auto loadPosition = [](f32x3 *) { if (noClipEnabled) SetLoc(savedLoc); };
+    const auto reloadConfig = [](f32x3 *) { ReadKeybindConfig(); };
 
     keybinds[K_TOGGLENOCLIP] = {"ToggleNoClip", VK_NUMPAD2, false, toggleNoClip};
     keybinds[K_PRINTPOS] = {"PrintPosition", VK_ADD, false, printLoc};
@@ -85,6 +83,7 @@ void LoadKeybinds() {
     keybinds[K_INCREASESPEED] = {"IncreaseSpeed", VK_NUMPAD3, false, increaseSpeed};
     keybinds[K_SAVEPOS] = {"SavePosition", VK_DIVIDE, false, savePosition};
     keybinds[K_LOADPOS] = {"LoadPosition", VK_MULTIPLY, false, loadPosition};
+    keybinds[K_RELOADCONFIG] = {"ReloadConfig", VK_DELETE, false, reloadConfig};
 
     ReadKeybindConfig();
 }
@@ -127,11 +126,8 @@ DWORD WINAPI MyModCode(LPVOID lpParam) {
         UpdateInput();
 
         f32x3 loc = GetPlayerLocation(); // Gets the player's location
-        // Debug print location
-        if (GetVKeyDown(VK_DELETE)) {
-            LogMessage("Reloading keybind config...");
-            ReadKeybindConfig();
-        }
+
+        TryActivate(K_RELOADCONFIG, &loc);
 
         // Debug print location
         TryActivate(K_PRINTPOS, &loc);

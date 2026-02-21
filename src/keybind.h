@@ -10,7 +10,7 @@ typedef struct keybind {
     void (*callback)(f32x3 *);
 } keybind;
 
-inline std::vector<keybind> keybinds(13);
+inline std::vector<keybind> keybinds(14);
 inline std::vector<unsigned char> previous(256);
 inline std::vector<unsigned char> current(256);
 
