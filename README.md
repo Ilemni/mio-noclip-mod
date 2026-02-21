@@ -16,9 +16,23 @@ Although damage sources aren't entirely ignored, during noclip. the player's HP 
 - `0`: Reset Z position to 0.
 - `/`: Save a position, `*`: Teleport to that saved position. By default this is the world origin.
 - `+`: Print current player position to console
-- `DEL`: Reload keybind file. This key cannot be rebound at this time.
+- `DEL`: Reload keybind and location file.
+- `Z`: Teleport to previous location in teleport list
+- `X`: Teleport to next location in teleport list
 
-The keybind file is located in the MIO install's `modconfig\noclip` folder. The keybind values use [Virtual Key Codes](https://learn.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes).
+The keybind file is located at `<Mio install location>\modconfig\noclip\keybinds.txt`. The keybind values use [Virtual Key Codes](https://learn.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes).
+
+Human-readable values can also be used, such as copying from the "Constants" value in the table, or certain shorthand values (such as N0 for Numpad0, * for Multiply)
+
+## Teleporting
+
+This mod also provides a way to teleport to specific coordinates in a list. This list is located at `modconfig\noclip\locations.txt`
+
+Locations can be listed like this
+```
+-1388.72 1551.13   Nexus Overseer
+-1578 1578.36      Mel's Shop
+```
 
 
 ## Prerequisites
