@@ -16,6 +16,7 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
 add_library(noclip MODULE
     src/my_mod.cpp
+    src/keybind.cpp
 )
 
 target_link_libraries(noclip PRIVATE
