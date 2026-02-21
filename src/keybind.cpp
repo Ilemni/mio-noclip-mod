@@ -1,10 +1,9 @@
 ﻿#include "keybind.h"
 
+#include "modding_api.h"
+
 #include <filesystem>
 #include <fstream>
-#include <functional>
-#include <ios>
-#include <ostream>
 #include <string>
 
 const auto keybind_config_dir = "modconfig/noclip/";

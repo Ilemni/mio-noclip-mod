@@ -1,7 +1,7 @@
 ﻿#pragma once
-#include <vector>
 
-#include "modding_api.h"
+#include <vector>
+#include <windows.h>
 
 typedef struct keybind {
     const char *name;
@@ -15,4 +15,5 @@ inline std::vector<unsigned char> previous(256);
 inline std::vector<unsigned char> current(256);
 
 void ReadKeybindConfig();
+
 bool TryActivate(byte kCode);
