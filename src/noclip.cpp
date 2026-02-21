@@ -84,8 +84,8 @@ void LoadKeybinds() {
     keybinds[K_SAVEPOS] = {"SavePosition", VK_DIVIDE, false, savePosition};
     keybinds[K_LOADPOS] = {"LoadPosition", VK_MULTIPLY, false, loadPosition};
     keybinds[K_RELOADCONFIG] = {"ReloadConfig", VK_DELETE, false, reloadConfig};
-    keybinds[K_PREVTELEPORT] = {"PrevTeleport", VK_SUBTRACT, false, prevTeleport };
-    keybinds[K_NEXTTELEPORT] = {"NextTeleport", VK_ADD, false, nextTeleport};
+    keybinds[K_PREVTELEPORT] = {"PrevTeleport", 0x5A /* Z key */, false, prevTeleport};
+    keybinds[K_NEXTTELEPORT] = {"NextTeleport", 0x58 /* X key */, false, nextTeleport};
 
     ReadKeybindConfig();
 }
