@@ -11,15 +11,15 @@ using ModAPI::Player::SetPlayerLocation;
 namespace {
     namespace Input {
         keybind* toggleNoClip = &keybinds[0];
-        keybind* moveLeft = &keybinds[1];
-        keybind* moveRight = &keybinds[2];
+        keybind* moveUp = &keybinds[1];
+        keybind* moveLeft = &keybinds[2];
         keybind* moveDown = &keybinds[3];
-        keybind* moveUp = &keybinds[4];
+        keybind* moveRight = &keybinds[4];
         keybind* moveBackward = &keybinds[5];
         keybind* moveForward = &keybinds[6];
-        keybind* resetZ = &keybinds[7];
-        keybind* decreaseSpeed = &keybinds[8];
-        keybind* increaseSpeed = &keybinds[9];
+        keybind* decreaseSpeed = &keybinds[7];
+        keybind* increaseSpeed = &keybinds[8];
+        keybind* resetZ = &keybinds[9];
         keybind* reloadConfig = &keybinds[10];
         keybind* printPosition = &keybinds[11];
     }

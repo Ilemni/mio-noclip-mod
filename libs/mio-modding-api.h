@@ -79,7 +79,6 @@ namespace ModAPI {
 	}
 	namespace Player {
 		extern "C" {
-			// pragma disable C4190
 #pragma warning (disable: 4190)
 			MODDING_API Vector3 GetPlayerLocation();
 			MODDING_API bool SetPlayerLocation(Vector3 location);
