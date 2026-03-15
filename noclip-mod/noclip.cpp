@@ -6,6 +6,36 @@
 #include <algorithm>
 
 namespace {
+    namespace Addresses {
+        void* playerSetXYOpAddr = nullptr;
+        void* playerSetZOpAddr1 = nullptr;
+        void* playerSetZOpAddr2 = nullptr;
+        char* playerSetXYOpOriginalBytes = nullptr;
+        char* playerSetZOpOriginalBytes1 = nullptr;
+        char* playerSetZOpOriginalBytes2 = nullptr;
+
+        auto LoadMemoryAddresses() -> bool {
+            HMODULE h_module = GetModuleHandleA("mio.exe");
+            if (!h_module) {
+                LogMessage("ERROR: Failed to get mio.exe module handle!");
+                return false;
+            }
+
+            const uintptr_t base_addr = reinterpret_cast<uintptr_t>(h_module);
+
+            playerSetXYOpAddr = reinterpret_cast<void*>(base_addr + 0x009D9B75); // NOLINT(performance-no-int-to-ptr)
+            playerSetZOpAddr1 = reinterpret_cast<void*>(base_addr + 0x009D9B7D); // NOLINT(performance-no-int-to-ptr)
+            playerSetZOpAddr2 = reinterpret_cast<void*>(base_addr + 0x009F107E); // NOLINT(performance-no-int-to-ptr)
+            playerSetXYOpOriginalBytes = new char[3];
+            playerSetZOpOriginalBytes1 = new char[5];
+            playerSetZOpOriginalBytes2 = new char[5];
+            ModAPI::Util::ReadMemory(playerSetXYOpAddr, playerSetXYOpOriginalBytes, 3);
+            ModAPI::Util::ReadMemory(playerSetZOpAddr1, playerSetZOpOriginalBytes1, 5);
+            ModAPI::Util::ReadMemory(playerSetZOpAddr2, playerSetZOpOriginalBytes2, 5);
+            return true;
+        }
+
+    }
     namespace Pointers {
         void* playerCollisionTypeBasePtr = nullptr;
 
@@ -23,7 +53,7 @@ namespace {
         }
     }
 
-    namespace Collision {
+    namespace Player {
         using ModAPI::Util::FollowPointer;
 
         byte GetPlayerCollisionType() {
@@ -52,6 +82,19 @@ namespace {
             }
 
             return success;
+        }
+
+        void DisableVanillaPlayerMovement() {
+            // Disable vanilla player Z movement by NOPing the instructions that set the player Z position each frame, we'll handle it ourselves in the mod tick
+            ModAPI::Util::NopBytes(Addresses::playerSetXYOpAddr, 3);
+            ModAPI::Util::NopBytes(Addresses::playerSetZOpAddr1, 5);
+            ModAPI::Util::NopBytes(Addresses::playerSetZOpAddr2, 5);
+        }
+
+        void RestoreVanillaPlayerMovement() {
+            ModAPI::Util::WriteMemory(Addresses::playerSetXYOpAddr, Addresses::playerSetXYOpOriginalBytes, 3);
+            ModAPI::Util::WriteMemory(Addresses::playerSetZOpAddr1, Addresses::playerSetZOpOriginalBytes1, 5);
+            ModAPI::Util::WriteMemory(Addresses::playerSetZOpAddr2, Addresses::playerSetZOpOriginalBytes2, 5);
         }
     }
 
@@ -118,6 +161,7 @@ namespace {
 }
 
 DWORD WINAPI NoClip(LPVOID) {
+    Addresses::LoadMemoryAddresses();
     Pointers::LoadMemoryAddresses();
     LoadKeybinds();
 
@@ -149,6 +193,7 @@ DWORD WINAPI NoClip(LPVOID) {
         if (currentLoc.x == -1 && currentLoc.y == -1 && currentLoc.z == -1) { // NOLINT(clang-diagnostic-float-equal)
             if (isNoClip) {
                 isNoClip = false;
+                Player::RestoreVanillaPlayerMovement();
                 LogMessage("NoClip disabled (invalid location)");
             }
             Sleep(10);
@@ -159,11 +204,13 @@ DWORD WINAPI NoClip(LPVOID) {
         if (Input::toggleNoClip->active()) {
             isNoClip = !isNoClip;
             if (isNoClip) {
-                prevCollisionType = Collision::GetPlayerCollisionType();
-                Collision::SetPlayerCollisionType(255);
+                prevCollisionType = Player::GetPlayerCollisionType();
+                Player::SetPlayerCollisionType(255);
+                Player::DisableVanillaPlayerMovement();
             }
             else {
-                Collision::SetPlayerCollisionType(prevCollisionType);
+                Player::SetPlayerCollisionType(prevCollisionType);
+                Player::RestoreVanillaPlayerMovement();
             }
 
             LogMessage("NoClip {}", isNoClip ? "enabled." : "disabled.");
