@@ -2,4 +2,4 @@
 
 #include <windows.h>
 
-DWORD WINAPI NoClip(LPVOID lpParam);
+DWORD WINAPI NoClip(LPVOID);

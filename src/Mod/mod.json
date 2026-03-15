@@ -1,0 +1,8 @@
+{
+    "id": "io.github.ilemni.mio-noclip-mod",
+    "name": "Noclip mod",
+    "main": "noclip-mod.dll",
+    "dependencies": [
+        "io.github.mio-modding.mio-modding-api"
+    ]
+}
