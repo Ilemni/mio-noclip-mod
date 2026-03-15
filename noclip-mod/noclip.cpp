@@ -5,10 +5,56 @@
 
 #include <algorithm>
 
-using ModAPI::Player::GetPlayerLocation;
-using ModAPI::Player::SetPlayerLocation;
-
 namespace {
+    namespace Pointers {
+        void* playerCollisionTypeBasePtr = nullptr;
+
+        auto LoadMemoryAddresses() -> bool {
+            HMODULE h_module = GetModuleHandleA("mio.exe");
+            if (!h_module) {
+                LogMessage("ERROR: Failed to get mio.exe module handle!");
+                return false;
+            }
+
+            const uintptr_t base_addr = reinterpret_cast<uintptr_t>(h_module);
+
+            playerCollisionTypeBasePtr = reinterpret_cast<void*>(base_addr + 0x010EFF48); // NOLINT(performance-no-int-to-ptr)
+            return true;
+        }
+    }
+
+    namespace Collision {
+        using ModAPI::Util::FollowPointer;
+
+        byte GetPlayerCollisionType() {
+            byte result = 0;
+            if (!Pointers::playerCollisionTypeBasePtr) {
+                return result;
+            }
+
+            void* collisionTypeAddr = FollowPointer(Pointers::playerCollisionTypeBasePtr, 0x14);
+            if (collisionTypeAddr) {
+                result = ModAPI::Util::ReadMemoryTyped<byte>(collisionTypeAddr);
+            }
+
+            return result;
+        }
+
+        bool SetPlayerCollisionType(const byte type) {
+            if (!Pointers::playerCollisionTypeBasePtr) {
+                return false;
+            }
+
+            void* collisionTypeAddr = FollowPointer(Pointers::playerCollisionTypeBasePtr, 0x14);
+            bool success = false;
+            if (collisionTypeAddr) {
+                success = ModAPI::Util::WriteMemoryTyped(collisionTypeAddr, type);
+            }
+
+            return success;
+        }
+    }
+
     namespace Input {
         keybind* toggleNoClip = &keybinds[0];
         keybind* moveUp = &keybinds[1];
@@ -32,6 +78,7 @@ namespace {
     auto currentLoc = Vector3(0, 0, 0);
 
     float speed = 0.0625f;
+    byte prevCollisionType = 0;
     bool isNoClip = false;
 
     void LoadKeybinds() {
@@ -71,13 +118,7 @@ namespace {
 }
 
 DWORD WINAPI NoClip(LPVOID) {
-    HMODULE module = GetModuleHandleA("mio.exe");
-    if (!module) {
-        LogMessage("ERROR: Failed to get mio.exe module handle!");
-        return 0;
-    }
-    baseAddr = reinterpret_cast<uintptr_t>(module);
-
+    Pointers::LoadMemoryAddresses();
     LoadKeybinds();
 
     // Looking for game window
@@ -90,10 +131,10 @@ DWORD WINAPI NoClip(LPVOID) {
     }
 
     while (true) {
-        // Sleep(1); // Update every 1ms, 10ms is a bit too jittery
+        Sleep(1); // Update every 1ms, 10ms is a bit too jittery
         UpdateInput();
 
-        currentLoc = GetPlayerLocation(); // Gets the player's location
+        currentLoc = ModAPI::Player::GetPlayerLocation(); // Gets the player's location
 
         if (Input::reloadConfig->active()) {
             ReadKeybindConfig();
@@ -117,6 +158,13 @@ DWORD WINAPI NoClip(LPVOID) {
         // Toggle noclip
         if (Input::toggleNoClip->active()) {
             isNoClip = !isNoClip;
+            if (isNoClip) {
+                prevCollisionType = Collision::GetPlayerCollisionType();
+                Collision::SetPlayerCollisionType(255);
+            }
+            else {
+                Collision::SetPlayerCollisionType(prevCollisionType);
+            }
 
             LogMessage("NoClip {}", isNoClip ? "enabled." : "disabled.");
             locLastFrame = currentLoc;
@@ -124,7 +172,7 @@ DWORD WINAPI NoClip(LPVOID) {
 
         // "No-clip" until we figure out preventing damage
         if (isNoClip) {
-            SetPlayerLocation(locLastFrame);
+            ModAPI::Player::SetPlayerLocation(locLastFrame);
             currentLoc = locLastFrame;
         }
 
@@ -166,7 +214,7 @@ DWORD WINAPI NoClip(LPVOID) {
         currentLoc.x += x;
         currentLoc.y += y;
         currentLoc.z += z;
-        SetPlayerLocation(currentLoc);
+        ModAPI::Player::SetPlayerLocation(currentLoc);
         locLastFrame = currentLoc;
     }
 }
