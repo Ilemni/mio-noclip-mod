@@ -11,7 +11,7 @@ This mod allows freely moving through the world without regard for gravity, coll
 - `2`: Enter/exit noclip. Anything that sets position is ignored when noclip is disabled. Noclip is automatically disabled while in menu or credits.
 - `1`,`3`: Decrease/Increase speed by a factor of 2
 - `8`,`4`,`5`,`6`: WASD movement.
-- `7`,`9`: Move along Z axis.
+- `7`,`9`: Move along Z axis (foreground/background).
 - `0`: Reset Z position to 0.
 - `DEL`: Reload keybind and location file.
 
